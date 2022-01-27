@@ -3,6 +3,7 @@ import pandas as pd
 import sqlalchemy as db
 import re
 import nltk
+nltk.download('stopwords')
 from nltk.corpus import stopwords
 from nltk.stem.wordnet import WordNetLemmatizer
 from nltk.tokenize import word_tokenize
@@ -16,12 +17,9 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.ensemble import RandomForestClassifier
 import numpy as np
 from sklearn.model_selection import GridSearchCV
-from tensorflow import keras
-from scikeras.wrappers import KerasClassifier
 from sklearn.base import TransformerMixin, BaseEstimator
 import pickle
 import os
-os.environ['CUDA_VISIBLE_DEVICES'] = '-1' # Tu run tensorflow on CPU
 
 
 

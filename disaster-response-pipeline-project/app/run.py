@@ -2,29 +2,50 @@ import json
 import plotly
 import pandas as pd
 
-from nltk.stem import WordNetLemmatizer
+import nltk
+nltk.download('stopwords')
+
+from nltk.corpus import stopwords
+from nltk.stem.wordnet import WordNetLemmatizer
 from nltk.tokenize import word_tokenize
+
+import re
 
 from flask import Flask
 from flask import render_template, request, jsonify
-from plotly.graph_objs import Bar
-from sklearn.externals import joblib
+from plotly.graph_objs import Bar, Pie
+import joblib
+# from sklearn.externals import joblib
 from sqlalchemy import create_engine
 import os
+
+from collections import Counter
 
 
 app = Flask(__name__)
 
 def tokenize(text):
-    tokens = word_tokenize(text)
+    '''
+    INPUT
+    text - the input text
+    
+    OUTPUT
+    tokens - the tokenized text
+    
+    This function cleans the tokenize the input text
+    '''
+    stop_words = stopwords.words("english")
     lemmatizer = WordNetLemmatizer()
+    # normalize case and remove punctuation
+    text = re.sub(r"[^a-zA-Z0-9]", " ", text.lower())
+    
+    # tokenize text
+    tokens = word_tokenize(text)
+    
+    # lemmatize andremove stop words
+    tokens = [lemmatizer.lemmatize(word) for word in tokens if word not in stop_words]
 
-    clean_tokens = []
-    for tok in tokens:
-        clean_tok = lemmatizer.lemmatize(tok).lower().strip()
-        clean_tokens.append(clean_tok)
-
-    return clean_tokens
+    return tokens
 
 # load data
 database_filepath = '../data/DisasterResponse.db'
@@ -40,6 +61,27 @@ model = joblib.load("../models/classifier.pkl")
 @app.route('/index')
 def index():
     
+    full_text = ''
+    for i in range(df.shape[0]):
+        full_text = full_text + df['message'].iloc[i] 
+
+    split_it = tokenize(full_text)
+
+    # Pass the split_it list to instance of Counter class.
+    counter = Counter(split_it)
+
+    # most_common() produces k frequently encountered
+    # input values and their respective counts.
+    most_occur = counter.most_common(20)
+    values = [most_occur[i][1] for i in range(len(most_occur))]
+    names = [most_occur[i][0] for i in range(len(most_occur))]
+    
+    column_names = df.columns
+    Y = df[column_names[4:]]
+    message_distribution = Y.sum()
+    y_message_distribution = column_names[4:]
+    
+    
     # extract data needed for visuals
     # TODO: Below is an example - modify to extract data for your own visuals
     genre_counts = df.groupby('genre').count()['message']
@@ -50,9 +92,9 @@ def index():
     graphs = [
         {
             'data': [
-                Bar(
-                    x=genre_names,
-                    y=genre_counts
+                Pie(
+                    labels=genre_names,
+                    values=genre_counts
                 )
             ],
 
@@ -63,6 +105,42 @@ def index():
                 },
                 'xaxis': {
                     'title': "Genre"
+                }
+            }
+        },
+                {
+            'data': [
+                Bar(
+                    x=y_message_distribution,
+                    y=message_distribution
+                )
+            ],
+
+            'layout': {
+                'title': 'Distribution of Message Category',
+                'yaxis': {
+                    'title': "Count"
+                },
+                'xaxis': {
+                    'title': ""
+                }
+            }
+        },
+                        {
+            'data': [
+                Bar(
+                    x=names,
+                    y=values
+                )
+            ],
+
+            'layout': {
+                'title': 'Most Frequent Words',
+                'yaxis': {
+                    'title': "Count"
+                },
+                'xaxis': {
+                    'title': "Word"
                 }
             }
         }
