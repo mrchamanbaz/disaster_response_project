@@ -1,116 +1,78 @@
 # Disaster Response Pipeline Project
 
-## Udacity Data Scientist Nanodegree
 
-### Description of the Project:
-This Project is a part of Data Science Nanodegree Program by Udacity. The goal of the project is to develop a machine learning pipeline that predict the category of incomming messages related to disaster response. The training dataset is a prelabelled set of messages provided in two files `disaster_messages.csv` (for the messages) and `disaster_categories.csv` (for the labels). A data dashboard is also developed so that the user can input new messages and finds out the corresponding category of the message. 
+## Description of the Project:
+This Project is a part of Data Science Nanodegree Program by Udacity. The goal of the project is to develop a pipeline that predicts the category of incoming messages related to disaster response. The training dataset is a prelabelled set of messages provided in two files `disaster_messages.csv` (for the messages) and `disaster_categories.csv` (for the labels). A data dashboard is also developed so that the user can input new messages and finds out the corresponding categories of the message. 
 
-### Project Structure 
+## Project Structure 
 
 The Project is divided into the following Sections:
 
-1. Data Processing: Data processing is performed in the file `ETL Pipeline Preparation.ipynb` and  ETL Pipeline to extract data from source, clean data and save them in a proper databse structure.
-2. Machine Learning Pipeline to train a model which is able to classify text messages in 36 categories.
-3. Web Application using Flask to show model results and predictions in real time.
+1. Data Processing: Data processing is performed in the file `ETL Pipeline Preparation.ipynb`. The same code is also included in `process_data.py`. This file reads the datasets, cleans and merge them together and saves the result in a sql database. 
+2. Machine Learning Pipeline: Designing and learning the classifier is performed in `ML Pipeline Preparation.ipynb` as well as the script `train_classifier.py`. In the jupyter notebook, we use a grid search as well as a neural network classifier (using tensorflow library) to train a model which is able to classify text messages in 36 categories. The best model turns out to be the tuned [K Nearest Neighbors](https://scikit-learn.org/stable/modules/generated/sklearn.neighbors.KNeighborsClassifier.html) model returned by a gridsearch over extensive simulation. The parameters leading to the best model are used in `train_classifier.py` to actually train and save the classifier as a pickle file.
+3. Web Application using Flask: This part is done in `run.py`. It creates a number of data explanatory visualizations as well as a dashboard to classify new messages. 
 
-### Data:
+## Data:
 
-The data in this project comes from Figure Eight - Multilingual Disaster Response Messages. This dataset contains 30,000 messages drawn from events including an earthquake in Haiti in 2010, an earthquake in Chile in 2010, floods in Pakistan in 2010, super-storm Sandy in the U.S.A. in 2012, and news articles spanning a large number of years and 100s of different disasters.
+The data in this project comes from Figure Eight - Multilingual Disaster Response Messages. Data is presented in two `.csv` files: 
+1. `disaster_messages.csv` which includes messages
+2. `disaster_categories.csv` which includes labels for each message.
 
-The data has been encoded with 36 different categories related to disaster response and has been stripped of messages with sensitive information in their entirety.
 
-Data includes 2 csv files:
-
-1. disaster_messages.csv: Messages data.
-2. disaster_categories.csv: Disaster categories of messages.
-
-### Folder Structure:
-
-* app
-    * | - templates
-        * |- master.html # main page of web application
-        * |- go.html # classification result page of web application
-    * |- run.py # Flask file that runs application
-
-* data
-   * |- disaster_categories.csv # data to process
-   * |- ML Pipeline Preparation.ipynb
-   * |- ETL Pipeline Preparation.ipynb
-   * |- disaster_messages.csv # data to process
-   * |- process_data.py
-   * |- Disaster_Response.db # database to save clean data to
-   
-* models
-   * |- train_classifier.py
-   * |- classifier.pkl # saved model
-
-* README.md
-
-### Required packages:
+## Required packages:
 
 This project requires Python 3.x and the following Python libraries:
 
-* Machine Learning Libraries: NumPy, SciPy, Pandas, Sciki-Learn
+* Machine Learning Libraries: NumPy, Pandas, Sciki-Learn, tensorflow
 * Natural Language Process Libraries: NLTK
 * SQLlite Database Libraqries: SQLalchemy
 * Web App and Data Visualization: Flask, Plotly
 
-### Instructions:
+## How to Run the Project:
 
-1. Clone this repository
+1. Clone the repository
 
 ```
-git clone git@github.com:prateeksawhney97/Disaster-Response-Pipeline.git
+git clone git@github.com:mrchamanbaz/disaster_response_project.git
 ```
 
-2. Run the following commands in the project's root directory to set up your database and model.
+2. Run the following commands to generate the database and model.
 
-    - To run ETL pipeline that cleans data and stores in database
-        `python data/process_data.py data/disaster_messages.csv data/disaster_categories.csv data/Disaster_Response.db`
-    - To run ML pipeline that trains classifier and saves
-        `python models/train_classifier.py data/Disaster_Response.db models/classifier.pkl`
+    - To perform data processing run the following code in data's directory
 
-3. Run the following command in the app's directory to run your web app.
+        `python process_data.py disaster_messages.csv disaster_categories.csv DisasterResponse.db`
+    - To design the classifier, run the following code in models' directory
+
+        `python train_classifier.py ../data/DisasterResponse.db classifier.pkl`
+
+3. Run the following command in the app's directory to run the web app.
+
     `python run.py`
 
-4. Go to http://0.0.0.0:3001/
+4. Go to the link specified by the flask app. For example if the code returns the following: 
+```
+Debugger PIN: 418-088-814
 
-### Screenshots:
+Running on all addresses.
 
-#### 1. Home Page
+Running on http://10.48.24.219:3001/ (Press CTRL+C to quit)
+```
+You should open http://10.48.24.219:3001/ in the browser to see the web app.
 
-![Screenshot from 2020-05-12 22-57-43](https://user-images.githubusercontent.com/34116562/81772729-39c76c80-9504-11ea-85e9-e5f45db2cbf6.png)
-![Screenshot from 2020-05-12 22-57-48](https://user-images.githubusercontent.com/34116562/81772741-3d5af380-9504-11ea-9ce3-afc7e78dddda.png)
-![Screenshot from 2020-05-12 22-57-53](https://user-images.githubusercontent.com/34116562/81772747-41871100-9504-11ea-942b-38846c7d49bf.png)
-![Screenshot from 2020-05-12 22-58-21](https://user-images.githubusercontent.com/34116562/81772751-451a9800-9504-11ea-9fe6-76bae5341ad4.png)
-
-#### 2. Classify Messages Page
-
-INPUT- Please provide healthcare equipments and medicines (EXAMPLE-1)
-
-![Screenshot from 2020-05-12 22-58-46](https://user-images.githubusercontent.com/34116562/81772761-4c41a600-9504-11ea-88af-90ecd9eb4ff5.png)
-
-PREDICTED CLASSES- 
-
-![Screenshot from 2020-05-12 22-58-56](https://user-images.githubusercontent.com/34116562/81772878-9b87d680-9504-11ea-8190-b9e4c8ae9e5b.png)
-![Screenshot from 2020-05-12 22-58-59](https://user-images.githubusercontent.com/34116562/81772887-9fb3f400-9504-11ea-8ed5-aae7f9d51e2d.png)
-
-INPUT- Its raining heavily since yesterday here (EXAMPLE-2)
-
-![Screenshot from 2020-05-12 22-59-10](https://user-images.githubusercontent.com/34116562/81773045-13560100-9505-11ea-8a95-f0992ec2236e.png)
-
-PREDICTED CLASSES- 
-
-![Screenshot from 2020-05-12 22-59-18](https://user-images.githubusercontent.com/34116562/81773048-14872e00-9505-11ea-874f-b5fa49ac5d28.png)
+## Appearance:
+The web app homepage looks like this:
 
 
-INPUT- Please help us with food and water (EXAMPLE-3)
+![Screenshot_1](https://github.com/mrchamanbaz/disaster_response_project/blob/b61b4c282dd8e91c477eddd535cdc2e8d481a949/screenshots/home_1.jpg?raw=true "Title")
 
-![Screenshot from 2020-05-12 23-00-55](https://user-images.githubusercontent.com/34116562/81773447-e3f3c400-9505-11ea-966a-e83099565f2a.png)
+In the homepage, you can see three graphs. The first graph shows the distribution of the message genres. The second and third graphs shown below present the histogram of 36 categories in the training dataset and 20 most frequent words after removing common words like 'the', 'of', 'a', etc.
 
+![Screenshot_1](https://github.com/mrchamanbaz/disaster_response_project/blob/b61b4c282dd8e91c477eddd535cdc2e8d481a949/screenshots/home_2.jpg?raw=true "Title")
 
-PREDICTED CLASSES- 
+On top of the homepage one can insert a new message and click 'classify message'. Doing this would take the user to the next page running the classification algorithm on the new message and returning back the predicted classes. We note that the problem is a multioutput classification problem then multiple categories (classes) can be predicted for a message. 
 
-![Screenshot from 2020-05-12 23-00-59](https://user-images.githubusercontent.com/34116562/81773451-e6eeb480-9505-11ea-93c3-f44885c83960.png)
+![Screenshot_1](https://github.com/mrchamanbaz/disaster_response_project/blob/b61b4c282dd8e91c477eddd535cdc2e8d481a949/screenshots/message_category.jpg?raw=true "Title")
 
-![Screenshot from 2020-05-12 23-01-03](https://user-images.githubusercontent.com/34116562/81773456-e9e9a500-9505-11ea-80b1-abd9c49830c2.png)
+## Licensing, Authors, and Acknowledgements
+
+Please feel free to use the code here as you would like. 
